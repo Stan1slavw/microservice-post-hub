@@ -2,8 +2,12 @@ package com.post_hub.iam_service.controller;
 
 import com.post_hub.iam_service.model.constants.ApiErrorMessage;
 import com.post_hub.iam_service.model.constants.ApiLogMessage;
+import com.post_hub.iam_service.model.dto.post.PostDTO;
 import com.post_hub.iam_service.model.entity.Post;
+import com.post_hub.iam_service.model.responce.IamResponse;
 import com.post_hub.iam_service.repositories.PostRepository;
+import com.post_hub.iam_service.service.PostService;
+import com.post_hub.iam_service.utils.ApiUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,20 +25,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostController {
 
     @Autowired
-    private PostRepository postRepository;
+    private PostService postService;
 
 
 
     @GetMapping("${end.point.id}")
-    public ResponseEntity<Post> getPostById(@PathVariable(name = "id") Integer postId) {
-        log.info(ApiLogMessage.POST_INFO_BY_ID.getMessage(postId));
-        System.out.println(postRepository.findById(postId));
-        return postRepository.findById(postId)
-                .map(ResponseEntity::ok)
-                .orElseGet(()-> {
-                    log.info(ApiErrorMessage.POST_INFO_BY_ID.getMessage(postId));
-                    return ResponseEntity.notFound().build();
-                });
+    public ResponseEntity<IamResponse<PostDTO>> getPostById(@PathVariable(name = "id") Integer postId) {
+        log.trace(ApiLogMessage.NAME_OF_CURRENT_METHOD.getValue(), ApiUtils.getMethodName());
 
+        IamResponse<PostDTO>  response = postService.getById(postId);
+        return ResponseEntity.ok(response);
     }
 }
