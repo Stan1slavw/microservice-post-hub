@@ -32,5 +32,5 @@ public interface PostMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "created", ignore = true)
-    Post update(@MappingTarget Post post, UpdatePostRequest request);
+    void update(@MappingTarget Post post, UpdatePostRequest request);
 }
