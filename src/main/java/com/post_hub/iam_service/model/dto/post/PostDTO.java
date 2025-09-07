@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.cglib.core.Local;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -19,5 +20,6 @@ public class PostDTO implements Serializable{
     private String content;
     private Integer likes;
     private LocalDateTime created;
+    private LocalDateTime updated;
 
 }
