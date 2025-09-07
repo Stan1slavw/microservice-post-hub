@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum ApiErrorMessage {
-    POST_INFO_BY_ID("Receiving post with ID was not found");
+    POST_INFO_BY_ID("Receiving post with ID: {} was not found");
 
     private final String message;
 
