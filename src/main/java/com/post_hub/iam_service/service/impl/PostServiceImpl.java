@@ -4,6 +4,7 @@ import com.post_hub.iam_service.mapper.PostMapper;
 import com.post_hub.iam_service.model.constants.ApiErrorMessage;
 import com.post_hub.iam_service.model.dto.post.PostDTO;
 import com.post_hub.iam_service.model.entity.Post;
+import com.post_hub.iam_service.model.exception.DataExistException;
 import com.post_hub.iam_service.model.exception.NotFoundException;
 import com.post_hub.iam_service.model.request.post.PostRequest;
 import com.post_hub.iam_service.model.responce.IamResponse;
@@ -26,7 +27,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public IamResponse<PostDTO> getById(@NotNull Integer postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(()-> new NotFoundException(ApiErrorMessage.POST_INFO_BY_ID.getMessage()));
+                .orElseThrow(()-> new NotFoundException(ApiErrorMessage.POST_INFO_BY_ID.getMessage(postId)));
         PostDTO postDTO = postMapper.toPostDTO(post);
 
         return IamResponse.createSuccessful(postDTO);
@@ -35,6 +36,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public IamResponse<PostDTO> createPost(@NotNull PostRequest postRequest) {
+        if (postRepository.existsByTitle(postRequest.getTitle())){
+            throw new DataExistException(ApiErrorMessage.POST_ALREADY_EXIST.getMessage(postRequest.getTitle()));
+        }
         Post post = postMapper.createdPost(postRequest);
         Post savedPost = postRepository.save(post);
         PostDTO postDTO = postMapper.toPostDTO(savedPost);

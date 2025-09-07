@@ -9,6 +9,7 @@ import com.post_hub.iam_service.model.responce.IamResponse;
 import com.post_hub.iam_service.repositories.PostRepository;
 import com.post_hub.iam_service.service.PostService;
 import com.post_hub.iam_service.utils.ApiUtils;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class PostController {
     }
 
     @PostMapping("${end.point.create}")
-    public ResponseEntity<IamResponse<PostDTO>> createPost(@RequestBody PostRequest postRequest){
+    public ResponseEntity<IamResponse<PostDTO>> createPost(@RequestBody @Valid PostRequest postRequest){
         log.trace(ApiLogMessage.NAME_OF_CURRENT_METHOD.getValue(), ApiUtils.getMethodName());
 
         IamResponse<PostDTO> response = postService.createPost(postRequest);
