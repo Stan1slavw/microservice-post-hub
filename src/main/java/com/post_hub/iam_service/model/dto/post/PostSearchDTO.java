@@ -1,10 +1,8 @@
 package com.post_hub.iam_service.model.dto.post;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.cglib.core.Local;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -12,12 +10,15 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostDTO implements Serializable{
+public class PostSearchDTO implements Serializable{
 
     private Integer id;
     private String title;
     private String content;
     private Integer likes;
     private LocalDateTime created;
+    private Boolean isDeleted;
 
 }
+
+
