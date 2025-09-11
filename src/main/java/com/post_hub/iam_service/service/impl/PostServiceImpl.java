@@ -5,6 +5,7 @@ import com.post_hub.iam_service.model.constants.ApiErrorMessage;
 import com.post_hub.iam_service.model.dto.post.PostDTO;
 import com.post_hub.iam_service.model.dto.post.PostSearchDTO;
 import com.post_hub.iam_service.model.entity.Post;
+import com.post_hub.iam_service.model.entity.User;
 import com.post_hub.iam_service.model.exception.DataExistException;
 import com.post_hub.iam_service.model.exception.NotFoundException;
 import com.post_hub.iam_service.model.request.post.PostRequest;
@@ -13,6 +14,7 @@ import com.post_hub.iam_service.model.request.post.UpdatePostRequest;
 import com.post_hub.iam_service.model.responce.IamResponse;
 import com.post_hub.iam_service.model.responce.PaginationResponse;
 import com.post_hub.iam_service.repositories.PostRepository;
+import com.post_hub.iam_service.repositories.UserRepository;
 import com.post_hub.iam_service.repositories.criteria.PostSearchCriteria;
 import com.post_hub.iam_service.service.PostService;
 import jakarta.validation.constraints.NotNull;
@@ -30,6 +32,7 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final PostMapper postMapper;
+    private final UserRepository userRepository;
 
 
 
@@ -44,11 +47,14 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public IamResponse<PostDTO> createPost(@NotNull PostRequest postRequest) {
+    public IamResponse<PostDTO> createPost(@NotNull Integer userId, PostRequest postRequest) {
         if (postRepository.existsByTitle(postRequest.getTitle())){
             throw new DataExistException(ApiErrorMessage.POST_ALREADY_EXIST.getMessage(postRequest.getTitle()));
         }
-        Post post = postMapper.createdPost(postRequest);
+        User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.USER_NOT_FOUND.getMessage(userId)));
+
+
+        Post post = postMapper.createdPost(postRequest, user);
         Post savedPost = postRepository.save(post);
         PostDTO postDTO = postMapper.toPostDTO(savedPost);
         return IamResponse.createSuccessful(postDTO);

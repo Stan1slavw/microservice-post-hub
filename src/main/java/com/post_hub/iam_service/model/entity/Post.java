@@ -41,6 +41,9 @@ public class Post {
     @Column(nullable = false)
     private Boolean deleted = false;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     public Integer getId() {
         return id;
