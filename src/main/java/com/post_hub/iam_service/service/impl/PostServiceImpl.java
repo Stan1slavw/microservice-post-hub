@@ -17,7 +17,6 @@ import com.post_hub.iam_service.repositories.criteria.PostSearchCriteria;
 import com.post_hub.iam_service.service.PostService;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

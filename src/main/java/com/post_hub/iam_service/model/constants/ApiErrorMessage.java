@@ -7,7 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ApiErrorMessage {
     POST_INFO_BY_ID("Receiving post with ID: %s was not found"),
-    POST_ALREADY_EXIST("Post with Title: %s already exist");
+    POST_ALREADY_EXIST("Post with Title: %s already exist"),
+    USER_NOT_FOUND("USER with ID: %s was not found");
 
     private final String message;
 
