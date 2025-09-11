@@ -6,7 +6,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class PostSearchRequest implements Serializable {
+public class    PostSearchRequest implements Serializable {
     private String title;
     private String content;
     private Integer likes;

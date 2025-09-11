@@ -31,6 +31,7 @@ public interface PostMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "user", source = "user")
+    @Mapping(target = "createdBy", source = "user.username")
     Post createdPost(PostRequest postRequest, User user);
 
     @Mapping(target = "id", ignore = true)
@@ -38,5 +39,6 @@ public interface PostMapper {
     void update(@MappingTarget Post post, UpdatePostRequest request);
 
     @Mapping(source = "deleted", target = "isDeleted")
+    @Mapping(target = "createdBy", source = "user.username")
     PostSearchDTO toPostSearchDTO(Post post);
 }

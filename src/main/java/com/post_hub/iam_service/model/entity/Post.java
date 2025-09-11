@@ -45,6 +45,9 @@ public class Post {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(name = "created_by")
+    private String createdBy;
+
     public Integer getId() {
         return id;
     }
