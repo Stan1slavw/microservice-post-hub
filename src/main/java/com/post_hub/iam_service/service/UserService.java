@@ -1,12 +1,10 @@
 package com.post_hub.iam_service.service;
 
-import com.post_hub.iam_service.model.dto.post.PostSearchDTO;
-import com.post_hub.iam_service.model.dto.post.UserSearchDTO;
+import com.post_hub.iam_service.model.dto.user.UserSearchDTO;
 import com.post_hub.iam_service.model.dto.user.UserDTO;
 import com.post_hub.iam_service.model.request.User.NewUserRequest;
 import com.post_hub.iam_service.model.request.User.UpdateUserRequest;
 import com.post_hub.iam_service.model.request.User.UserSearchRequest;
-import com.post_hub.iam_service.model.request.post.PostSearchRequest;
 import com.post_hub.iam_service.model.responce.IamResponse;
 import com.post_hub.iam_service.model.responce.PaginationResponse;
 import jakarta.validation.constraints.NotNull;

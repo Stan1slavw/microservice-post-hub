@@ -10,7 +10,8 @@ public enum ApiErrorMessage {
     POST_ALREADY_EXIST("Post with Title: %s already exist"),
     USER_NOT_FOUND("USER with ID: %s was not found"),
     USERNAME_ALREADY_EXIST("User with Username: %s already exist"),
-    EMAIL_ALREADY_EXIST("User with this Email: %s already exist");
+    EMAIL_ALREADY_EXIST("User with this Email: %s already exist"),
+    USER_ROLE_NOT_FOUND("Role with name: %s was not found");
 
     private final String message;
 
