@@ -15,6 +15,7 @@ import com.post_hub.iam_service.model.responce.IamResponse;
 import com.post_hub.iam_service.repositories.RoleRepository;
 import com.post_hub.iam_service.repositories.UserRepository;
 import com.post_hub.iam_service.security.encrypt.JwtTokenProvider;
+import com.post_hub.iam_service.security.validation.AccessValidator;
 import com.post_hub.iam_service.service.AuthService;
 import com.post_hub.iam_service.service.RefreshTokenService;
 import com.post_hub.iam_service.service.model.IamServiceUserRole;
@@ -43,6 +44,7 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenService refreshTokenService;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AccessValidator accessValidator;
 
     @Override
     public IamResponse<UserProfileDto> login(@NotNull LoginRequest request) {
@@ -76,28 +78,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public IamResponse<UserProfileDto> registerUser(@NotNull RegistrationUserRequest request) {
-        userRepository.findByUsername(request.getUsername()).ifPresent(existingUser -> {
-            throw new DataExistException(ApiErrorMessage.USER_ALREADY_EXISTS.getMessage(request.getUsername()));
-        });
 
-        userRepository.findByEmail(request.getEmail()).ifPresent(existingUser -> {
-            throw new DataExistException(ApiErrorMessage.USER_ALREADY_EXISTS.getMessage(request.getEmail()));
-        });
+        accessValidator.validateNewUser(request.getUsername(), request.getEmail(), request.getPassword(), request.getConfirmPassword());
 
         Role userRole = roleRepository.findByName(IamServiceUserRole.USER.getRole()).orElseThrow(() ->
                 new NotFoundException(ApiErrorMessage.NOT_FOUND_USER_ROLE.getMessage(IamServiceUserRole.USER.getRole()))
         );
-
-        String password = request.getPassword();
-        String confirmPassword = request.getConfirmPassword();
-
-        if (!password.equals(confirmPassword)) {
-            throw new InvalidDataException(ApiErrorMessage.MISMATCH_PASSWORDS.getMessage());
-        }
-
-        if (PasswordUtils.isNotValidPassword(password)) {
-            throw new InvalidDataException(ApiErrorMessage.INVALID_PASSWORD.getMessage());
-        }
 
         User newUser = userMapper.fromDto(request);
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
