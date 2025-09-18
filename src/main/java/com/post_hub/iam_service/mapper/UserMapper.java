@@ -1,6 +1,7 @@
 package com.post_hub.iam_service.mapper;
 
 import com.post_hub.iam_service.model.dto.role.RoleDTO;
+import com.post_hub.iam_service.model.dto.user.RegistrationUserRequest;
 import com.post_hub.iam_service.model.dto.user.UserProfileDto;
 import com.post_hub.iam_service.model.dto.user.UserSearchDTO;
 import com.post_hub.iam_service.model.dto.user.UserDTO;
@@ -47,6 +48,11 @@ public interface UserMapper {
     @Mapping(target = "token", source = "token")
     @Mapping(target = "refreshToken", source = "refreshToken")
     UserProfileDto toUserProfileDto(User user, String token, String refreshToken);
+
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "registrationStatus", expression = "java(RegistrationStatus.ACTIVE)")
+    User fromDto(RegistrationUserRequest request);
 
     default List<RoleDTO> mapRoles(Collection<Role> roles){
         return roles.stream()
