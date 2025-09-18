@@ -12,11 +12,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
@@ -35,5 +33,16 @@ public class AuthController {
         Cookie authtorizationCookie = ApiUtils.createAuthCookie(result.getPayload().getToken());
         response.addCookie(authtorizationCookie);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("${end.point.refresh.token}")
+    public ResponseEntity<IamResponse<UserProfileDto>> refreshToken(@RequestParam(name = "token") String token, HttpServletResponse response){
+        log.trace(ApiLogMessage.NAME_OF_CURRENT_METHOD.getValue(), ApiUtils.getMethodName());
+
+        IamResponse<UserProfileDto> result = authService.refreshAccessToken(token);
+        Cookie authtorizationCookie = ApiUtils.createAuthCookie(result.getPayload().getToken());
+        response.addCookie(authtorizationCookie);
+        return ResponseEntity.ok(result);
+
     }
 }

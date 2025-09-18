@@ -32,11 +32,13 @@ public class SecurityConfig {
 
     private final JwtRequestFilter jwtRequestFilter;
 
+    private static final String GET = "GET";
     private static final String POST = "POST";
 
     private static final String[] NOT_SECURED_URLS = {
             "/auth/login",
-            "/auth/register"
+            "/auth/register",
+            "/auth/refresh/token",
     };
 
 
