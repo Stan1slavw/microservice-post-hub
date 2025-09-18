@@ -23,12 +23,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +45,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public IamResponse<UserDTO> getById(@NotNull Integer userId) {
-        User user = userRepository.findByIdAndDeletedFalse(userId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.USER_NOT_FOUND.getMessage(userId)));
+        User user = userRepository.findByIdAndDeletedFalse(userId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.USER_NOT_FOUND_BY_ID.getMessage(userId)));
         UserDTO userDTO = userMapper.toDTO(user);
 
         return IamResponse.createSuccessful(userDTO);
@@ -50,15 +54,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public IamResponse<UserDTO> createUser(@NotNull NewUserRequest newUserRequest) {
         if (userRepository.existsByUsername(newUserRequest.getUsername())){
-            throw new DataExistException(ApiErrorMessage.USERNAME_ALREADY_EXIST.getMessage(newUserRequest.getUsername()));
+            throw new DataExistException(ApiErrorMessage.USER_ALREADY_EXISTS.getMessage(newUserRequest.getUsername()));
         }
 
         if (userRepository.existsByEmail(newUserRequest.getEmail())){
-            throw new DataExistException(ApiErrorMessage.EMAIL_ALREADY_EXIST.getMessage(newUserRequest.getEmail()));
+            throw new DataExistException(ApiErrorMessage.EMAIL_ALREADY_EXISTS.getMessage(newUserRequest.getEmail()));
         }
 
         Role userRole = roleRepository.findByName(IamServiceUserRole.USER.getRole())
-                .orElseThrow(()-> new NotFoundException(ApiErrorMessage.USER_ROLE_NOT_FOUND.getMessage()));
+                .orElseThrow(()-> new NotFoundException(ApiErrorMessage.NOT_FOUND_USER_ROLE.getMessage()));
 
         User user = userMapper.create(newUserRequest);
         user.setPassword(passwordEncoder.encode(newUserRequest.getPassword()));
@@ -73,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public IamResponse<UserDTO> updateUser(@NotNull Integer userId, @NotNull UpdateUserRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.USER_NOT_FOUND.getMessage(userId)));
+        User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.USER_NOT_FOUND_BY_ID.getMessage(userId)));
         userMapper.updatePost(user, request);
         user.setUpdated(LocalDateTime.now());
         user = userRepository.save(user);
@@ -85,7 +89,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void softDeleteUser(Integer userId) {
-        User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.USER_NOT_FOUND.getMessage(userId)));
+        User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.USERNAME_NOT_FOUND.getMessage(userId)));
         user.setDeleted(true);
         userRepository.save(user);
     }
@@ -127,5 +131,22 @@ public class UserServiceImpl implements UserService {
 
         return IamResponse.createSuccessful(response);
 
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return getUserDetails(email, userRepository);
+    }
+
+    static UserDetails getUserDetails(String email, UserRepository userRepository){
+        User user = userRepository.findByEmail(email).orElseThrow(()-> new NotFoundException(ApiErrorMessage.EMAIL_NOT_FOUND.getMessage(email)));
+        user.setLastLogin(LocalDateTime.now());
+        userRepository.save(user);
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                user.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList())
+        );
     }
 }

@@ -39,7 +39,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public IamResponse<PostDTO> getById(@NotNull Integer postId) {
         Post post = postRepository.findByIdAndDeletedFalse(postId)
-                .orElseThrow(()-> new NotFoundException(ApiErrorMessage.POST_INFO_BY_ID.getMessage(postId)));
+                .orElseThrow(()-> new NotFoundException(ApiErrorMessage.POST_NOT_FOUND_BY_ID.getMessage(postId)));
         PostDTO postDTO = postMapper.toPostDTO(post);
 
         return IamResponse.createSuccessful(postDTO);
@@ -49,9 +49,9 @@ public class PostServiceImpl implements PostService {
     @Override
     public IamResponse<PostDTO> createPost(@NotNull Integer userId, PostRequest postRequest) {
         if (postRepository.existsByTitle(postRequest.getTitle())){
-            throw new DataExistException(ApiErrorMessage.POST_ALREADY_EXIST.getMessage(postRequest.getTitle()));
+            throw new DataExistException(ApiErrorMessage.POST_ALREADY_EXISTS.getMessage(postRequest.getTitle()));
         }
-        User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.USER_NOT_FOUND.getMessage(userId)));
+        User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.USER_NOT_FOUND_BY_ID.getMessage(userId)));
 
 
         Post post = postMapper.createdPost(postRequest, user);
@@ -62,7 +62,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public IamResponse<PostDTO> updatePost(@NotNull Integer postId, @NotNull UpdatePostRequest request) {
-        Post post = postRepository.findByIdAndDeletedFalse(postId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.POST_INFO_BY_ID.getMessage(postId)));
+        Post post = postRepository.findByIdAndDeletedFalse(postId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.POST_NOT_FOUND_BY_ID.getMessage(postId)));
 
         postMapper.update(post, request);
         post.setUpdated(LocalDateTime.now());
@@ -74,7 +74,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void softDeletePost(@NotNull Integer postId) {
-        Post post = postRepository.findByIdAndDeletedFalse(postId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.POST_INFO_BY_ID.getMessage(postId)));
+        Post post = postRepository.findByIdAndDeletedFalse(postId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.POST_NOT_FOUND_BY_ID.getMessage(postId)));
 
         post.setDeleted(true);
         postRepository.save(post);
