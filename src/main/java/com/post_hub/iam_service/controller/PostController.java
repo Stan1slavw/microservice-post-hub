@@ -24,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.security.Principal;
 
 @Slf4j
@@ -38,7 +39,7 @@ public class PostController {
 
 
     @GetMapping("${end.point.id}")
-    public ResponseEntity<IamResponse<PostDTO>> getPostById(@PathVariable(name = "id") Integer postId) {
+    public ResponseEntity<IamResponse<PostDTO>> getPostById(@PathVariable(name = "id") Integer postId) throws AccessDeniedException {
         log.trace(ApiLogMessage.NAME_OF_CURRENT_METHOD.getValue(), ApiUtils.getMethodName());
 
         IamResponse<PostDTO> response = postService.getById(postId);
@@ -56,7 +57,7 @@ public class PostController {
 
     @PutMapping("${end.point.id}")
     public ResponseEntity<IamResponse<PostDTO>> updatePostById(@PathVariable(name = "id") Integer postId,
-                                                               @RequestBody @Valid UpdatePostRequest request) {
+                                                               @RequestBody @Valid UpdatePostRequest request) throws AccessDeniedException {
         log.trace(ApiLogMessage.NAME_OF_CURRENT_METHOD.getValue(), ApiUtils.getMethodName());
         IamResponse<PostDTO> updatePost = postService.updatePost(postId, request);
         return ResponseEntity.ok(updatePost);
