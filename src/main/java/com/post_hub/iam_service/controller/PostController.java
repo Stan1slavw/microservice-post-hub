@@ -24,6 +24,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @Slf4j
 @RestController
 @Validated
@@ -44,11 +46,11 @@ public class PostController {
     }
 
     @PostMapping("${end.point.create}")
-    public ResponseEntity<IamResponse<PostDTO>> createPost(@RequestBody @Valid PostRequest postRequest) {
+    public ResponseEntity<IamResponse<PostDTO>> createPost(@RequestBody @Valid PostRequest postRequest, Principal principal) {
         log.trace(ApiLogMessage.NAME_OF_CURRENT_METHOD.getValue(), ApiUtils.getMethodName());
 
-        int userId =1;
-        IamResponse<PostDTO> response = postService.createPost(userId, postRequest);
+
+        IamResponse<PostDTO> response = postService.createPost(postRequest, principal.getName());
         return ResponseEntity.ok(response);
     }
 
