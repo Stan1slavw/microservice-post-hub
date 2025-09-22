@@ -16,6 +16,7 @@ import com.post_hub.iam_service.model.responce.PaginationResponse;
 import com.post_hub.iam_service.repositories.RoleRepository;
 import com.post_hub.iam_service.repositories.UserRepository;
 import com.post_hub.iam_service.repositories.criteria.UserSearchCriteria;
+import com.post_hub.iam_service.security.validation.AccessValidator;
 import com.post_hub.iam_service.service.UserService;
 import com.post_hub.iam_service.service.model.IamServiceUserRole;
 import jakarta.validation.constraints.NotNull;
@@ -42,6 +43,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private AccessValidator accessValidator;
 
     @Override
     public IamResponse<UserDTO> getById(@NotNull Integer userId) {
@@ -78,6 +80,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public IamResponse<UserDTO> updateUser(@NotNull Integer userId, @NotNull UpdateUserRequest request) {
         User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.USER_NOT_FOUND_BY_ID.getMessage(userId)));
+
+
+        accessValidator.validateAdminOrOwnerAccess(userId);
+
+        if (userRepository.existsByUsername(request.getUsername())){
+            throw new DataExistException(ApiErrorMessage.USER_ALREADY_EXISTS.getMessage(request.getUsername()));
+        }
+
+        if (userRepository.existsByEmail(request.getEmail())){
+            throw new DataExistException(ApiErrorMessage.EMAIL_ALREADY_EXISTS.getMessage(request.getEmail()));
+        }
+
         userMapper.updatePost(user, request);
         user.setUpdated(LocalDateTime.now());
         user = userRepository.save(user);
@@ -90,6 +104,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void softDeleteUser(Integer userId) {
         User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.USERNAME_NOT_FOUND.getMessage(userId)));
+
+        accessValidator.validateAdminOrOwnerAccess(userId);
+
         user.setDeleted(true);
         userRepository.save(user);
     }

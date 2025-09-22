@@ -8,7 +8,7 @@ import lombok.Getter;
 public enum IamServiceUserRole {
     USER("USER"),
     ADMIN("ADMIN"),
-    SUPER_ADMIN("SUPERADMIN");
+    SUPER_ADMIN("SUPER_ADMIN");
 
     private final String role;
 

@@ -71,7 +71,7 @@ public class PostServiceImpl implements PostService {
     public IamResponse<PostDTO> updatePost(@NotNull Integer postId, @NotNull UpdatePostRequest request){
         Post post = postRepository.findByIdAndDeletedFalse(postId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.POST_NOT_FOUND_BY_ID.getMessage(postId)));
 
-        accessValidator.validateAdminOrOwnerAccess(post.getUser().getUsername(), post.getCreatedBy());
+        accessValidator.validateAdminOrOwnerAccess(post.getUser().getId());
 
         if (postRepository.existsByTitle(request.getTitle())){
             throw new DataExistException(ApiErrorMessage.POST_ALREADY_EXISTS.getMessage(request.getTitle()));
@@ -90,7 +90,7 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findByIdAndDeletedFalse(postId).orElseThrow(()-> new NotFoundException(ApiErrorMessage.POST_NOT_FOUND_BY_ID.getMessage(postId)));
 
 
-        accessValidator.validateAdminOrOwnerAccess(post.getUser().getUsername(), post.getCreatedBy());
+        accessValidator.validateAdminOrOwnerAccess(post.getUser().getId());
 
         post.setDeleted(true);
         postRepository.save(post);
