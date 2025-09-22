@@ -58,9 +58,9 @@ CREATE TABLE refresh_token(
 INSERT INTO users(username, password, email, created, updated, registration_status, last_login, deleted)
 VALUES ('super_admin', '$2a$10$OCyWYH4GqvVUfFkFByYgk.ilzA.zPr64JDQIk2C6ZJ7cxheSHndw.', 'superadmin@gmail.com',
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE', CURRENT_TIMESTAMP, false),
-       ('admin', '$2a$10$a5XfcSkpXr7yg6ONS1OUpORT3gd0gZ6pPIvztrE2VnouDxC8SFzO6', 'admin@gmail.com',
+       ('admin', '$2a$10$F5KEL3Da4pSKPH7EOI5d1eruRF6NrNFlyQwyAx6gWx6GVBoUE5j3u', 'admin@gmail.com',
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE', CURRENT_TIMESTAMP, false),
-       ('user', '$2a$10$4nqp5RH7vgqztRQP2qQSwe8AJFzVMVuwKxQ7WreyemaKCpfTZnDp6', 'user@gmail.com',
+       ('user', '$2a$10$qOT7UOYd2UA/hK.mFP1xI.Bh2jbYHsFZViDNog7fJiPABZj2EE74q', 'user@gmail.com',
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE', CURRENT_TIMESTAMP, false);
 
 INSERT INTO posts(user_id, title, content, created, updated, deleted, likes)

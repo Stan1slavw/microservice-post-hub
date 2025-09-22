@@ -1,11 +1,15 @@
 package com.post_hub.iam_service.config;
 
+import com.post_hub.iam_service.model.responce.IamResponse;
 import com.post_hub.iam_service.security.filter.JwtRequestFilter;
+import com.post_hub.iam_service.security.handler.AccessRestrictHandler;
 import com.post_hub.iam_service.service.UserService;
+import com.post_hub.iam_service.service.model.IamServiceUserRole;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.filters.RequestFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,6 +36,8 @@ public class SecurityConfig {
 
     private final JwtRequestFilter jwtRequestFilter;
 
+    private final AccessRestrictHandler accessRestrictHandler;
+
     private static final String GET = "GET";
     private static final String POST = "POST";
 
@@ -39,6 +45,7 @@ public class SecurityConfig {
             "/auth/login",
             "/auth/register",
             "/auth/refresh/token",
+            "/posts/create",
     };
 
 
@@ -49,10 +56,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth-> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(NOT_SECURED_URLS).permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/users/all").hasAnyAuthority(adminAccessSecurityRoles())
+//                        .requestMatchers(HttpMethod.GET, "/posts/all").hasAnyAuthority(adminAccessSecurityRoles())
+                        .requestMatchers(HttpMethod.POST, "/users/create").hasAnyAuthority(adminAccessSecurityRoles())
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                        .accessDeniedHandler(accessRestrictHandler)
         )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -76,5 +87,13 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
+    private String[] adminAccessSecurityRoles(){
+        return new String[]{
+                IamServiceUserRole.SUPER_ADMIN.getRole(),
+                IamServiceUserRole.ADMIN.getRole()
+        };
+    }
+
 
 }
