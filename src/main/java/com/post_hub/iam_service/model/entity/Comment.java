@@ -31,7 +31,7 @@ public class Comment {
     private String message;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime created = LocalDateTime.now();
 
     @Column(nullable = false)
     private LocalDateTime updated = LocalDateTime.now();
