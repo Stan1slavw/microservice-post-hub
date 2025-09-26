@@ -16,6 +16,7 @@ public enum ApiErrorMessage {
     EMAIL_NOT_FOUND("Email: '%s' not found."),
     USERNAME_NOT_FOUND("Username: '%s' not found."),
     INVALID_TOKEN_SIGNATURE("Invalid token signature"),
+    COMMENT_NOT_FOUND_BY_ID("Comment with ID: %s was not found."),
 
     ERROR_DURING_JWT_PROCESSING("An unexpected error occurred during JWT processing"),
     TOKEN_EXPIRED("Token expired."),
