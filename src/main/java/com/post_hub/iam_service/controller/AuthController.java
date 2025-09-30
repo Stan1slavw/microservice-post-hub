@@ -29,7 +29,6 @@ public class AuthController {
             @RequestBody @Valid LoginRequest request,
             HttpServletResponse response){
         log.trace(ApiLogMessage.NAME_OF_CURRENT_METHOD.getValue(), ApiUtils.getMethodName());
-
         IamResponse<UserProfileDto> result = authService.login(request);
         Cookie authtorizationCookie = ApiUtils.createAuthCookie(result.getPayload().getToken());
         response.addCookie(authtorizationCookie);

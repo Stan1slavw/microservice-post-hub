@@ -41,34 +41,36 @@ public class SecurityConfig {
     private static final String GET = "GET";
     private static final String POST = "POST";
 
-    private static final String[] NOT_SECURED_URLS = {
-            "/auth/login",
-            "/auth/register",
-            "/auth/refresh/token",
-            "/posts/create",
-    };
+        private static final String[] NOT_SECURED_URLS = {
+                "/auth/login",
+                "/auth/register",
+                "/auth/refresh/token",
+                "/posts/create",
+                "/comment/*"
+        };
 
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth-> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(NOT_SECURED_URLS).permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/users/all").hasAnyAuthority(adminAccessSecurityRoles())
-//                        .requestMatchers(HttpMethod.GET, "/posts/all").hasAnyAuthority(adminAccessSecurityRoles())
-                        .requestMatchers(HttpMethod.POST, "/users/create").hasAnyAuthority(adminAccessSecurityRoles())
-                        .anyRequest().authenticated()
-                )
-                .exceptionHandling(exceptions -> exceptions
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-                        .accessDeniedHandler(accessRestrictHandler)
-        )
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+            http
+                    .csrf(AbstractHttpConfigurer::disable)
+                    .authorizeHttpRequests(auth-> auth
+                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/comment/**").authenticated()
+                            .requestMatchers(NOT_SECURED_URLS).permitAll()
+    //                        .requestMatchers(HttpMethod.GET, "/users/all").hasAnyAuthority(adminAccessSecurityRoles())
+    //                        .requestMatchers(HttpMethod.GET, "/posts/all").hasAnyAuthority(adminAccessSecurityRoles())
+                            .requestMatchers(HttpMethod.POST, "/users/create").hasAnyAuthority(adminAccessSecurityRoles())
+                            .anyRequest().authenticated()
+                    )
+                    .exceptionHandling(exceptions -> exceptions
+                            .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                            .accessDeniedHandler(accessRestrictHandler)
+            )
+                    .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+            return http.build();
+        }
 
     @Bean
     public PasswordEncoder passwordEncoder(){
