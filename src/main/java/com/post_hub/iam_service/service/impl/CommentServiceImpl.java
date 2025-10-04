@@ -4,6 +4,7 @@ import com.post_hub.iam_service.mapper.CommentMapper;
 import com.post_hub.iam_service.mapper.PostMapper;
 import com.post_hub.iam_service.model.constants.ApiErrorMessage;
 import com.post_hub.iam_service.model.dto.comment.CommentDTO;
+import com.post_hub.iam_service.model.dto.comment.CommentSearchDTO;
 import com.post_hub.iam_service.model.entity.Comment;
 import com.post_hub.iam_service.model.entity.Post;
 import com.post_hub.iam_service.model.entity.User;
@@ -11,6 +12,7 @@ import com.post_hub.iam_service.model.exception.NotFoundException;
 import com.post_hub.iam_service.model.request.comment.CommentRequest;
 import com.post_hub.iam_service.model.request.comment.UpdateCommentRequest;
 import com.post_hub.iam_service.model.responce.IamResponse;
+import com.post_hub.iam_service.model.responce.PaginationResponse;
 import com.post_hub.iam_service.repositories.CommentRepository;
 import com.post_hub.iam_service.repositories.PostRepository;
 import com.post_hub.iam_service.repositories.UserRepository;
@@ -19,6 +21,8 @@ import com.post_hub.iam_service.utils.ApiUtils;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.net.ConnectException;
@@ -86,5 +90,23 @@ public class CommentServiceImpl implements CommentService {
         postRepository.save(post);
 
         IamResponse.createSuccessful(postMapper.toPostDTO(post));
+    }
+
+    @Override
+    public IamResponse<PaginationResponse<CommentSearchDTO>> findAllComments(Pageable pageable) {
+        Page<CommentSearchDTO> comments = commentRepository.findAll(pageable)
+                .map(commentMapper::toCommentSearchDto);
+
+        PaginationResponse<CommentSearchDTO> paginationResponse = new PaginationResponse<>(
+                comments.getContent(),
+                new PaginationResponse.Pagination(
+                        comments.getTotalElements(),
+                        comments.getSize(),
+                        comments.getNumber() + 1,
+                        comments.getTotalPages()
+                )
+        );
+
+        return IamResponse.createSuccessful(paginationResponse);
     }
 }
