@@ -1,6 +1,7 @@
 package com.post_hub.iam_service.service.impl;
 
 import com.post_hub.iam_service.mapper.CommentMapper;
+import com.post_hub.iam_service.mapper.PostMapper;
 import com.post_hub.iam_service.model.constants.ApiErrorMessage;
 import com.post_hub.iam_service.model.dto.comment.CommentDTO;
 import com.post_hub.iam_service.model.entity.Comment;
@@ -32,6 +33,7 @@ public class CommentServiceImpl implements CommentService {
     private final ApiUtils apiUtils;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final PostMapper postMapper;
     @Override
     public IamResponse<CommentDTO> getCommentById(@NotNull Integer commentId) {
         Comment comment = commentRepository.findByIdAndDeletedFalse(commentId)
@@ -70,5 +72,19 @@ public class CommentServiceImpl implements CommentService {
         comment = commentRepository.save(comment);
 
         return IamResponse.createSuccessful(commentMapper.toDto(comment));
+    }
+
+    @Override
+    public void softDeleteComment(@NotNull Integer commentId) {
+        Comment comment = commentRepository.findByIdAndDeletedFalse(commentId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorMessage.COMMENT_NOT_FOUND_BY_ID.getMessage(commentId)));
+
+        comment.setDeleted(true);
+        commentRepository.save(comment);
+
+        Post post = comment.getPost();
+        postRepository.save(post);
+
+        IamResponse.createSuccessful(postMapper.toPostDTO(post));
     }
 }
