@@ -46,7 +46,12 @@ public class SecurityConfig {
                 "/auth/register",
                 "/auth/refresh/token",
                 "/posts/create",
-                "/comment/*"
+                "/comment/*",
+                "/v3/api-docs/**",
+                "/swagger-ui/**",
+                "/swagger-ui.html",
+                "//webjars/**"
+
         };
 
 
