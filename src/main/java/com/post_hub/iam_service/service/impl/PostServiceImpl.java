@@ -1,5 +1,6 @@
 package com.post_hub.iam_service.service.impl;
 
+import com.post_hub.iam_service.kafka.service.KafkaMessageService;
 import com.post_hub.iam_service.mapper.PostMapper;
 import com.post_hub.iam_service.model.constants.ApiErrorMessage;
 import com.post_hub.iam_service.model.dto.post.PostDTO;
@@ -37,6 +38,7 @@ public class PostServiceImpl implements PostService {
     private final PostMapper postMapper;
     private final UserRepository userRepository;
     private final AccessValidator accessValidator;
+    private final KafkaMessageService kafkaMessageService;
 
 
 
@@ -64,6 +66,9 @@ public class PostServiceImpl implements PostService {
         post.setCreatedBy(username);
         Post savedPost = postRepository.save(post);
         PostDTO postDTO = postMapper.toPostDTO(savedPost);
+
+        kafkaMessageService.sendPostCreatedMessage(user.getId(), savedPost.getId());
+
         return IamResponse.createSuccessful(postDTO);
     }
 
@@ -82,6 +87,9 @@ public class PostServiceImpl implements PostService {
         post = postRepository.save(post);
 
         PostDTO postDTO = postMapper.toPostDTO(post);
+
+        kafkaMessageService.sendPostUpdatedMessage(post.getUser().getId(), post.getId());
+
         return IamResponse.createSuccessful(postDTO);
     }
 
@@ -94,6 +102,8 @@ public class PostServiceImpl implements PostService {
 
         post.setDeleted(true);
         postRepository.save(post);
+
+        kafkaMessageService.sendPostDeletedMessage(post.getUser().getId(), post.getId());
     }
 
     @Override
